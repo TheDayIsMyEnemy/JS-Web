@@ -2,18 +2,16 @@ const fs = require('fs');
 const path = require('path');
 const url = require('url');
 
-function getContentType (path){
-    let index = path.indexOf('.');
-    if(index != -1){
-        let type = path.substring(index+1);
+const mimeTypes = {
+    css:'text/css',
+    ico:'image/x-icon',
+    jpg:'image/jpeg',
+    jpeg:'image/jpeg'
+}
 
-        if(type == "css"){
-            return "text/css";
-        }
-        else if(type == "ico"){
-            return "image/x-icon";
-        }
-    }
+function getContentType (path){
+    let type = path.split('.').pop();
+    return mimeTypes[type];
 }
 
 module.exports = (req, res) => {
