@@ -1,8 +1,8 @@
 const url = require('url');
 const fs = require('fs');
 const path = require('path');
-const database = require('../config/database.js');
 const qs = require('querystring');
+const Product = require('../models/Product');
 
 module.exports = (req,res) => {
     
@@ -21,32 +21,31 @@ module.exports = (req,res) => {
                 return;
             }
 
-            let products = database.products.getAll();
-            let content = "";
-            let queryData = qs.parse(url.parse(req.url).query);
+            Product.find().then((products)=>{
+                let content = "";
+                let queryData = qs.parse(url.parse(req.url).query);
+                if(queryData.query){
+                      products = products.filter(v=> v.name == queryData.query);
+                  }
 
-            if(queryData.query){
-                products = products.filter(v=> v.name == queryData.query);
-            }
-
-            for(let p of products){
-                content+=
-                    `<div class="product-card">
-                        <img class="product-img" src="${p.image}">
-                        <h2>${p.name}</h2>
-                        <p>${p.description}</p>
-                    </div>`
-            }
-            
-            let html = data.toString().replace('{content}', content);
-
-            res.writeHead(200, {
-                'Content-Type': 'text/html'
+                  for(let p of products){
+                    content+=
+                        `<div class="product-card">
+                              <img class="product-img" src="${p.image}">
+                            <h2>${p.name}</h2>
+                            <p>${p.description}</p>
+                        </div>`
+                }
+                
+                let html = data.toString().replace('{content}', content);
+    
+                res.writeHead(200, {
+                    'Content-Type': 'text/html'
+                });
+    
+                res.write(html);
+                res.end();
             });
-
-            res.write(html);
-            res.end();
-
         });
     }
     else{
