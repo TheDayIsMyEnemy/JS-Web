@@ -5,6 +5,6 @@ let categorySchema = mongoose.Schema({
     products: [{type:mongoose.Schema.Types.ObjectId, ref: 'Product'}]
 });
 
-let Category = mongoose.model('Category,', categorySchema);
+let Category = mongoose.model('Category', categorySchema);
 
 module.exports = Category;

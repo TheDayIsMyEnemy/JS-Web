@@ -1,54 +1,23 @@
-const url = require('url');
-const fs = require('fs');
-const path = require('path');
-const qs = require('querystring');
 const Product = require('../models/Product');
 
-module.exports = (req,res) => {
-    
-    req.pathname = req.pathname || url.parse(req.url).pathname
-    if(req.pathname === '/' && req.method === 'GET'){
-        let filePath = path.normalize(path.join(__dirname, '../views/home/index.html'));
-        
-        fs.readFile(filePath, (err,data) => {
-            if(err){
-                res.writeHead(404, {
-                    'Content-Type': 'text/plain'
-                });
+module.exports.index = (req, res) => {
+    let queryData = req.query;
+    Product.find().populate('category').then((products) => {
+        let content = "";
 
-                res.write('404 not found');
-                res.end();
-                return;
-            }
+        if (queryData.query) {
+            products = products.filter(v => v.name == queryData.query);
+        }
 
-            Product.find().then((products)=>{
-                let content = "";
-                let queryData = qs.parse(url.parse(req.url).query);
-                if(queryData.query){
-                      products = products.filter(v=> v.name == queryData.query);
-                  }
+        let data = {products: products};
+        if(req.query.error){
+            data.error = req.query.error;
+        }else if(req.query.success){
+            data.success = req.query.success;
+        }
 
-                  for(let p of products){
-                    content+=
-                        `<div class="product-card">
-                              <img class="product-img" src="${p.image}">
-                            <h2>${p.name}</h2>
-                            <p>${p.description}</p>
-                        </div>`
-                }
-                
-                let html = data.toString().replace('{content}', content);
-    
-                res.writeHead(200, {
-                    'Content-Type': 'text/html'
-                });
-    
-                res.write(html);
-                res.end();
-            });
-        });
-    }
-    else{
-        return true;
-    }
+        //console.log(products);
+
+        res.render('home/index',data);
+    });
 }   
