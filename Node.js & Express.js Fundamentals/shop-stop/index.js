@@ -1,4 +1,4 @@
-const port = 1337;
+const port = 2337;
 const config = require('./config/config');
 const database = require('./config/database.config');
 const express = require('express');
